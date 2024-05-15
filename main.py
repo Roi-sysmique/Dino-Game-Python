@@ -4,7 +4,8 @@ import random
 pygame.init()
 
 SCREEN_HEIGHT, SCREEN_WIDTH = 500, 1000
-font = pygame.font.Font(None, 50)
+score_font = pygame.font.Font(None, 80)
+game_over_font = pygame.font.Font(None, 150)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Dino game')
 clock = pygame.time.Clock()
@@ -14,6 +15,9 @@ start_time = 0
 lap = 0
 speed = -6
 interval = 15
+game_run = True
+game_over_txt = game_over_font.render('Game-Over', False, 'red')
+game_over_rect = game_over_txt.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
 
 class Player(pygame.sprite.Sprite):
@@ -45,7 +49,6 @@ class Obstacle(pygame.sprite.Sprite):
     def update(self):
         global score, lap, speed, interval
         augmentation = score - lap
-        print(f"{augmentation}: {lap}, {speed}: {interval}")
         if augmentation >= 50 and speed != -10:
             speed -= 1
             interval -= 2
@@ -77,18 +80,23 @@ while True:
             pygame.quit()
             quit()
 
-    score = int(pygame.time.get_ticks() / 100)
-    obstacles.update()
-    score_text = font.render(str(score), False, 'white')
-    score_rect = score_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-    input_keys = pygame.key.get_pressed()
-    screen.blit(background, (0, 0))
-    screen.blit(dino.image, dino.rect)
-    obstacles.draw(screen)
-    screen.blit(score_text, score_rect)
-    dino.update(input_keys)
-    wave_systeme()
-    obstacle.update()
+    if game_run:
+        score = int(pygame.time.get_ticks() / 100)
+        obstacles.update()
+        score_text = score_font.render(str(score), False, 'white')
+        score_rect = score_text.get_rect(center=(SCREEN_WIDTH / 2, 125))
+        input_keys = pygame.key.get_pressed()
+        screen.blit(background, (0, 0))
+        screen.blit(dino.image, dino.rect)
+        obstacles.draw(screen)
+        screen.blit(score_text, score_rect)
+        dino.update(input_keys)
+        wave_systeme()
+        obstacle.update()
+        if pygame.sprite.spritecollideany(dino, obstacles, None):
+            game_run = False
+    else:
+        screen.blit(game_over_txt, game_over_rect)
 
     pygame.display.update()
     clock.tick(75)
