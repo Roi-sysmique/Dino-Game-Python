@@ -6,6 +6,8 @@ pygame.init()
 SCREEN_HEIGHT, SCREEN_WIDTH = 500, 1000
 score_font = pygame.font.Font(None, 80)
 game_over_font = pygame.font.Font(None, 150)
+reset_font = pygame.font.Font(None, 50)
+pause_font = pygame.font.Font(None, 125)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Dino game')
 clock = pygame.time.Clock()
@@ -13,11 +15,17 @@ background = pygame.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 background.fill('black')
 start_time = 0
 lap = 0
+reset = 0
 speed = -6
 interval = 15
 game_run = True
+game_pause = False
 game_over_txt = game_over_font.render('Game-Over', False, 'red')
-game_over_rect = game_over_txt.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+game_over_rect = game_over_txt.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50))
+reset_txt = reset_font.render("press ENTER to restart", False, 'white')
+reset_rect = reset_txt.get_rect(midtop=game_over_rect.midbottom)
+pause_txt = reset_font.render("PAUSE", False, 'white')
+pause_rect = pause_txt.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
 
 class Player(pygame.sprite.Sprite):
@@ -79,9 +87,24 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+        if game_run:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                game_pause = True
+                game_run = False
+        elif game_pause:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                game_pause = False
+                game_run = True
+        else:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                game_run = True
+                pygame.sprite.Group.empty(obstacles)
+                reset = int(pygame.time.get_ticks() / 100)
+                speed = -6
+                interval = 15
 
     if game_run:
-        score = int(pygame.time.get_ticks() / 100)
+        score = int(pygame.time.get_ticks() / 100) - reset
         obstacles.update()
         score_text = score_font.render(str(score), False, 'white')
         score_rect = score_text.get_rect(center=(SCREEN_WIDTH / 2, 125))
@@ -95,8 +118,11 @@ while True:
         obstacle.update()
         if pygame.sprite.spritecollideany(dino, obstacles, None):
             game_run = False
+    elif game_pause:
+        screen.blit(pause_txt, pause_rect)
     else:
         screen.blit(game_over_txt, game_over_rect)
+        screen.blit(reset_txt, reset_rect)
 
     pygame.display.update()
     clock.tick(75)
