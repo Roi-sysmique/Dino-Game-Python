@@ -104,12 +104,12 @@ class Cloud(pygame.sprite.Sprite):
             self.kill()
 
 
-class Pterodactyle(pygame.sprite.Sprite):
+class Pterodactyl(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.animation = 0
-        self.sprite_list = ["ASSETS/pterodactyle1.png", "ASSETS/pterodactyle2.png"]
+        self.sprite_list = ["ASSETS/pterodactyl1.png", "ASSETS/pterodactyl2.png"]
         self.image = pygame.image.load(self.sprite_list[int(self.animation)])
         self.rect = self.image.get_rect(center=(SCREEN_WIDTH + 50, SCREEN_HEIGHT/2 + 115))
 
@@ -126,7 +126,7 @@ dino = Player()
 obstacle = Obstacle()
 obstacles = pygame.sprite.Group()
 clouds = pygame.sprite.Group()
-pterodactyles = pygame.sprite.Group()
+pterodactyls = pygame.sprite.Group()
 
 
 def cactus_wave_systeme():
@@ -135,19 +135,17 @@ def cactus_wave_systeme():
     if break_time >= random.randint(interval, 15):
         start_time = int(pygame.time.get_ticks() / 100)
         if score < 100:
-            pterodactyle = Pterodactyle()
-            pterodactyles.add(pterodactyle)
+            obstalce = Obstacle()
+            obstacles.add(obstalce)
         else:
             if choice == 1:
-                print(choice)
                 choice = random.choice(choices)
                 obstalce = Obstacle()
                 obstacles.add(obstalce)
             else:
-                print(choice)
                 choice = random.choice(choices)
-                pterodactyle = Pterodactyle()
-                pterodactyles.add(pterodactyle)
+                pterodactyl = Pterodactyl()
+                pterodactyls.add(pterodactyl)
 
 
 def clouds_wave_systeme():
@@ -178,7 +176,7 @@ while True:
                 game_run = True
                 pygame.sprite.Group.empty(obstacles)
                 pygame.sprite.Group.empty(clouds)
-                pygame.sprite.Group.empty(pterodactyles)
+                pygame.sprite.Group.empty(pterodactyls)
                 reset = int(pygame.time.get_ticks() / 100)
                 speed = -6
                 interval = 15
@@ -197,14 +195,14 @@ while True:
         screen.blit(ground, ground_rect3)
         screen.blit(dino.image, dino.rect)
         obstacles.draw(screen)
-        pterodactyles.draw(screen)
+        pterodactyls.draw(screen)
         screen.blit(score_text, score_rect)
         dino.update(input_keys)
         clouds.update()
         cactus_wave_systeme()
         clouds_wave_systeme()
         obstacle.update()
-        pterodactyles.update()
+        pterodactyls.update()
         ground_rect.move_ip(speed, 0)
         ground_rect1.move_ip(speed, 0)
         ground_rect2.move_ip(speed, 0)
@@ -219,7 +217,7 @@ while True:
             ground_rect3.left = ground_rect2.right
         if pygame.sprite.spritecollideany(dino, obstacles, None):
             game_run = False
-        if pygame.sprite.spritecollideany(dino, pterodactyles, None):
+        if pygame.sprite.spritecollideany(dino, pterodactyls, None):
             game_run = False
     elif game_pause:
         screen.blit(pause_txt, pause_rect)
